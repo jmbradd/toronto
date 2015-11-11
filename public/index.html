@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Toronto</title>
+    <link rel="stylesheet" type="text/css" href="./js/sweetalert/dist/sweetalert.css"/>
 </head>
-<body>
-<h1>Hey Jennie</h1>
+<body ng-app="toronto">
+    <div ng-controller="triviaController">
+        <h1 ng-repeat="question in questions">{{question.question}}<small>{{question.answer}}</small></h1>
+
+    <button ng-click="startQuiz()">Start Quiz</button>
+
+    <h1>Hey Jennie</h1>
+    <script src="./js/testdata.json"></script>
+    <script src="./js/sweetalert/dist/sweetalert-dev.js"></script>
+
+    <script src="./js/angular/angular.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/testdata.json"></script>
+    <script src="./js/controllers/testdata.json"></script>
+    <script src="./js/controllers/triviaController.js"></script>
+    <script src="./js/services/socketService.js"></script>
+
+    </div>
+
 </body>
 </html>
