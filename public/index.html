@@ -6,23 +6,60 @@
     <link rel="stylesheet" type="text/css" href="./js/sweetalert/dist/sweetalert.css"/>
 </head>
 <body ng-app="toronto">
-    <div ng-controller="triviaController">
-        <h1 ng-repeat="question in questions">{{question.question}}<small>{{question.answer}}</small></h1>
+
+    <div ng-controller="testController">
+        <h1>User: </h1><h1>{{currentUser}}</h1>
+        <h2>{{socketID}}</h2>
+
+
 
     <button ng-click="startQuiz()">Start Quiz</button>
+        <input ng-model="form.username" type="text" text="username" />
+        <button ng-click="joinServer(form)">Join Server</button>
+        <button ng-click="logrooms()">Get Rooms</button>
+        <div ng-repeat="room in currentRooms">
+            <h1>{{room.id}}:{{room.name}}</h1>
+            <h4 ng-repeat="player in room.players">{[player.name}}</h4>
+        </div>
+        <h1 ng-repeat="room in currentRooms">{{room.id}}:{{room.name}}</h1>
 
-    <h1>Hey Jennie</h1>
+
+
+
+
+        <div ng-repeat="question in questions | limitTo: 1" ng-if="quizRunning">
+            {{question.question}}
+            {{question.answer}}
+            <input ng-model="form.answer" type="text" text="answer"/>
+            <button ng-click="checkAnswer(form)">Next Question</button>
+        </div>
+
+
+    <ng-view></ng-view>
+    </div>
     <script src="./js/testdata.json"></script>
     <script src="./js/sweetalert/dist/sweetalert-dev.js"></script>
 
     <script src="./js/angular/angular.js"></script>
+    <script src="./js/angular-route/angular-route.js"></script>
+    <script src="./js/angular-cookies/angular-cookies.js"></script>
+    <script src="./views/lobby/lobby.js"></script>
     <script src="./js/app.js"></script>
     <script src="./js/testdata.json"></script>
     <script src="./js/controllers/testdata.json"></script>
+    <script src="./js/services/quizService.js"></script>
+<script src="./js/services/userService.js"></script>
     <script src="./js/controllers/triviaController.js"></script>
+    <script src="./js/controllers/testController.js"></script>
+    <script src="./js/controllers/lobbyCtrl.js"></script>
+<script src="./js/controllers/userCtrl.js"></script>
+    <script src="http://localhost:1967/socket.io/socket.io.js"></script>
     <script src="./js/services/socketService.js"></script>
 
-    </div>
+
+
+
+
 
 </body>
 </html>

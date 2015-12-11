@@ -1,0 +1,12 @@
+{
+  "greetings": {
+    "badPlayer": [],
+    "goodPlayer" : [],
+    "newPlayer" : [
+      {"type" : "friendly", "text" : "Welcome!  Glad to see we found another person with nothing else to do this evening"},
+      {"type" : "hostile", "text" : "Look what the cat dragged in"},
+      {"type" : "irreverant", "text" : "Ladies and Gentleman what a surprise!"},
+      {"type" : "DPRK", "text" : "This room has become a SHEET OF FLAMES"}
+    ]
+  }
+}

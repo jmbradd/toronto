@@ -1,0 +1,17 @@
+<body>
+    <div>
+    <h1>{{userName}}</h1>
+        <div ng-repeat="room in qs.rooms">
+            <h2>{{room.name}}</h2><button ng-click="joinRoom(room.id)">Join</button>
+            <div ng-repeat="player in room.players">
+                <h3>{{player.username}}</h3>
+            </div>
+            <div ng-repeat="message in room.messages | limitTo: -5"><h5>{{message.text}}<small>{{message.user}}</small></h5>
+            </div>
+            <div>
+                <input type="text" ng-model="form.message">type a message</input><button btn-default ng-click="sendMessage(form, room.id)">Send Message</button>
+            </div>
+
+        </div>
+    </div>
+</body>

@@ -6,6 +6,7 @@
   "dependencies": {
     "angular": "^1.4.7",
     "body-parser": "^1.14.1",
+    "cookie-parser": "^1.4.0",
     "mongoose": "^4.2.4",
     "morgan": "^1.6.1"
   },
