@@ -8,6 +8,7 @@ var mongoose = require("mongoose");
 var roomManager = require("../components/roomManager");
 var path = require('path');
 var socketManager = ("../components/socketManager")
+var gameManager = require("../components/gameManager")
 
 module.exports = function(app, io){
 
@@ -29,6 +30,8 @@ module.exports = function(app, io){
                 "username" : req.session.username,
                 "socketID" : req.session.socketID
             }
+
+            io.to(req.session.socketID).emit("redirect", {"redirect" : "/lobby"})
 
             res.json(userData);
         }
@@ -133,15 +136,25 @@ module.exports = function(app, io){
 
     app.get('/status', function(req, res){
 
+        res.send(req.session)
+
+
+    })
+    app.get("/games", function(req, res){
+
+        var games = gameManager.getGames();
+        res.send(games);
+    })
+
+    app.get('/players', function(req, res){
         var players = roomManager.getPlayers();
-        res.send(players)
-
-
+        res.send(players);
     })
 
     app.get('*', function(req, res){
         res.sendFile(path.join(__dirname, '../public/index.html'));
     });
+
 
 
 }

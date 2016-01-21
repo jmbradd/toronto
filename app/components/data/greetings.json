@@ -8,5 +8,19 @@
       {"type" : "irreverant", "text" : "Ladies and Gentleman what a surprise!"},
       {"type" : "DPRK", "text" : "This room has become a SHEET OF FLAMES"}
     ]
+  },
+  "results":{
+    "correct" : [
+      {"type" : "friendly", "text" : "Great work!"},
+      {"type" : "friendly", "text" : "Wow that was amazing"},
+      {"type" : "mean", "text" : "Are you fucking kidding me?  You call that a question?  Wow.  Take your points."},
+      {"type" : "mean", "text" : "Wow, cool...you got it right...Still won't make that phone ring"}
+    ],
+    "incorrect" : [
+      {"type" : "friendly", "text" : "Dang, i'm sure you'll get it next time"},
+      {"type" : "friendly", "text" : "Wow that was a hard one."},
+      {"type" : "mean", "text" : "Not looking so how now are ya?"},
+      {"type" : "mean", "text" : "http://lmgtfy.com/?q=dumb"}
+    ]
   }
 }

@@ -1,16 +1,52 @@
-<body>
-    <div>
-    <h1>{{userName}}</h1>
-        <div ng-repeat="room in qs.rooms">
-            <h2>{{room.name}}</h2><button ng-click="joinRoom(room.id)">Join</button>
-            <div ng-repeat="player in room.players">
-                <h3>{{player.username}}</h3>
+<body style="padding-top: 50px;">
+    <div style="padding-top: 75px">
+        <div class="container">
+
+            <div class="pull-left">
+                <div class="panel panel-primary">
+                    <div class="panel-heading ">
+                        <h3 class="panel-title">Available Rooms</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <uib-accordion>
+                            <uib-accordion-group ng-repeat="room in qs.rooms">
+                                <uib-accordion-heading>
+                                    {{room.name}}
+                                    <i ng-show="room.mode == 'democracy'" uib-popover="{{room.mode}}" popover-trigger="mouseenter" class="fa fa-check-square"></i>
+                                    <i ng-show="room.mode == 'autocracy'" uib-popover="{{room.mode}}" popover-trigger="mouseenter" class="fa fa-hand-rock-o fa-rotate-90"></i>
+                                </uib-accordion-heading>
+                                <p>Current Players: {{room.players.length}}</p>
+                                <p>Game Mode: {{room.mode}}</p>
+                                <button ng-show="room.status == 'available'" style="display: block;"  class="btn btn-default btn-xs" ng-click="joinRoom(room.id)">Join</button>
+                            </uib-accordion-group>
+                        </uib-accordion>
+                    </div>
+                </div>
+
             </div>
-            <div ng-repeat="message in room.messages | limitTo: -5"><h5>{{message.text}}<small>{{message.user}}</small></h5>
+
+
+            <div class="pull-right panel">
+                <uib-tabset>
+                    <uib-tab ng-repeat="room in qs.rooms | filter: roomJoined('joined') "
+                            active="tab.active"
+                            disabled="tab.disabled">
+                        <uib-tab-heading>
+                            {{room.name}} <i ng-show="room.status == 'joined'" class="fa fa-sign-out"></i>
+                        </uib-tab-heading>
+                        <div ng-repeat="message in room.messages"><p><b>{{message.user}}:</b> {{message.text}}</p> </div>
+                        <form name="form.chat" novalidate class="simple-form">
+                            <input type="text" ng-model="form.chat.message"/>
+                            <input type="button" class="btn btn-primary btn-xs" ng-click="sendMessage(form.chat, room)" value="Send Message"/>
+                            <button id="btnReady" type="button" class="btn btn-default btn-xs" ng-class="btnreadyClass" ng-click="readyToggle(room)">{{button}}</button>
+                            <button id="gameStart" type="button" class="btn btn-warning btn-xs" ng-click="gameInit(room)">Start Game</button>
+
+                        </form>
+                    </uib-tab>
+                </uib-tabset>
             </div>
-            <div>
-                <input type="text" ng-model="form.message">type a message</input><button btn-default ng-click="sendMessage(form, room.id)">Send Message</button>
-            </div>
+
 
         </div>
     </div>

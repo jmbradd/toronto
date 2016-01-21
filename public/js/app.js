@@ -5,13 +5,11 @@
 var app = angular.module("toronto", [
     'ngRoute',
     'toronto.lobby',
+    'toronto.quiz',
+    'toronto.home',
     'ngCookies',
-    'SocketService'
+    'SocketService',
+    'ui.bootstrap'
 ]).config(['$routeProvider', function($routeProvider){
-    $routeProvider.otherwise({redirectTo: '/'})
-}]).run(function($rootScope, $location, $http, userService){
-    $http.get('http://localhost:1967/initialize')
-        .success(function(user) {
-            userService.setUser(user.username);
-        });
-});
+    $routeProvider.otherwise({redirectTo: '/home'})
+}]);

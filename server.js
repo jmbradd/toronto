@@ -9,14 +9,18 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var cookies = require('cookie-parser');
 var expSessions = require('express-session');
-//var RedisStore = require('connect-redis')(expSessions);
+var RedisStore = require('connect-redis')(expSessions);
 var path = require('path');
 var cors = require('cors');
 var io = require('socket.io')(server);
 var sharedsession = require('express-socket.io-session')
 var assholeHost = require('./app/components/assholeHost')
-var MemoryStore = expSessions.MemoryStore
-var sessionStore = new MemoryStore();
+var roomManager = require('./app/components/roomManager')
+var gameManager = require('./app/components/gameManager')(app,io,mongoose, roomManager, assholeHost)
+var redis = require('redis')
+
+var client = redis.createClient()
+var sessionStore = new RedisStore({ host: 'localhost', port: 6379, client: client,  ttl : 10000});
 
 var sessions = expSessions(
     {

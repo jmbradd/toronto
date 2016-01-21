@@ -3,27 +3,41 @@
  */
 app.factory("userService", function($http, $rootScope, $location, $cookies, socketService){
 
-    var username = "not logged in";
-    var rooms = [];
+
+
     var service = {};
 
+    service.loggedIn = false
+    service.user = {}
+    service.playersConnected = 75
+
+    service.rooms = [];
+
     service.getUser = function(){
-        return userName;
+        return service.user;
     };
 
     service.getRooms = function(){
-        return rooms;
+        return service.rooms;
     };
 
-    service.setUser = function(username){
-        userName = username;
-        $rootScope.$broadcast("refreshuser");
+    service.setUser = function(userObj){
+        service.user = userObj;
+
     };
 
-    service.addRoom = function(room){
-        rooms.push(room);
-        $rootScope.$broadcast("refreshuser");
-    };
+
+
+    socketService.on("userdata", function(data){
+        console.log("recieved user data")
+        console.log(data);
+        service.user = data
+        console.log(service.loggedIn)
+        service.loggedIn = (data.username == "") ? false : true
+        service.rooms = data.rooms
+        console.log(service.loggedIn)
+        $location.path(data.redirect);
+    })
 
 
     return service;

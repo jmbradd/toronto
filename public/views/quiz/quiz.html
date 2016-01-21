@@ -1,0 +1,31 @@
+<body >
+    <div class="container" style="padding-top: 75px;">
+        <div>
+            <div class="container">
+                <div><small>Game: {{qs.currentGame.id}}</small></div>
+                <div class="pull-left">
+                    <h2>Current Scores</h2>
+                    <ul>
+                        <li ng-repeat="score in qs.currentScores | orderBy: score.score">{{score.username}} {{score.score}}</li>
+                    </ul>
+
+                </div>
+                <div class="pull-left well">
+                    <div>
+                         <h3>Round {{qs.question.round}}</h3>
+                         <h4>{{qs.question.text}}</h4><i ng-if="qs.questionStatus == 'answered' " class="fa fa-lock"></i>
+                    </div>
+                    <div>
+                        <button  ng-disabled="qs.questionStatus == 'answered'" class="btn btn-success" ng-click="answerQuestion(true)">True</button><button  ng-disabled="qs.questionStatus == 'answered'" class="btn btn-danger" ng-click="answerQuestion(false)">False</button>
+                    </div>
+                </div>
+
+                <div class="pull-right">
+                    <div ng-repeat="message in qs.currentRoom.messages"><h5>{{message.text}} <small>{{message.user}}</small></h5></div>
+                    <div><ng-form ng-model="message"><input ng-model="message.text"/><a class="btn btn-default" ng-click="sendMessage(message, qs.currentGame.id)">Send Message</a></div></ng-form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>

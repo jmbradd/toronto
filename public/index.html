@@ -3,57 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <title>Toronto</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/readable/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="./js/sweetalert/dist/sweetalert.css"/>
+    <link rel="stylesheet" type="text/css" href="./js/font-awesome/css/font-awesome.css" />
 </head>
 <body ng-app="toronto">
+<div class="container">
 
-    <div ng-controller="testController">
-        <h1>User: </h1><h1>{{currentUser}}</h1>
-        <h2>{{socketID}}</h2>
+    <nav class="navbar navbar-default navbar-fixed-top" ng-controller="userCtrl">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">That totally happened</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <!-- <li class="active"><a href="#">Home</a></li>
+                    <!-- <li><a href="#about">About</a></li>
+                     <li><a href="#contact">Contact</a></li>
+                     <li class="dropdown">
+                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                         <ul class="dropdown-menu">
+                             <li><a href="#">Action</a></li>
+                             <li><a href="#">Another action</a></li>
+                             <li><a href="#">Something else here</a></li>
+                             <li role="separator" class="divider"></li>
+                             <li class="dropdown-header">Nav header</li>
+                             <li><a href="#">Separated link</a></li>
+                             <li><a href="#">One more separated link</a></li>
+                         </ul>
+                     </li> -->
+                </ul>
+                <div class="nav navbar-nav navbar-right" ng-if="!us.loggedIn" style="vertical-align: top;">
+                <ul class="nav navbar-nav navbar-right" >
+                    <li><input ng-model="login.username"/></li>
+                    <li><input ng-model="login.password"/></li>
+                    <li><button class="btn btn-default nav-btn"  ng-click="joinServer(login)">Login</button></li>
+                </ul>
+                </div>
 
-
-
-    <button ng-click="startQuiz()">Start Quiz</button>
-        <input ng-model="form.username" type="text" text="username" />
-        <button ng-click="joinServer(form)">Join Server</button>
-        <button ng-click="logrooms()">Get Rooms</button>
-        <div ng-repeat="room in currentRooms">
-            <h1>{{room.id}}:{{room.name}}</h1>
-            <h4 ng-repeat="player in room.players">{[player.name}}</h4>
+                <div class="nav navbar-nav navbar-right" ng-if="us.loggedIn">
+                    <ul class="nav navbar-nav navbar-right" >
+                        <li>{{us.user.username}}</li>
+                        <li><a class="btn btn-warning" ng-click="logout()">Logout</a></li>
+                    </ul>
+                </div>
+            </div><!--/.nav-collapse -->
         </div>
-        <h1 ng-repeat="room in currentRooms">{{room.id}}:{{room.name}}</h1>
+    </nav>
 
-
-
-
-
-        <div ng-repeat="question in questions | limitTo: 1" ng-if="quizRunning">
-            {{question.question}}
-            {{question.answer}}
-            <input ng-model="form.answer" type="text" text="answer"/>
-            <button ng-click="checkAnswer(form)">Next Question</button>
-        </div>
 
 
     <ng-view></ng-view>
     </div>
     <script src="./js/testdata.json"></script>
     <script src="./js/sweetalert/dist/sweetalert-dev.js"></script>
-
     <script src="./js/angular/angular.js"></script>
     <script src="./js/angular-route/angular-route.js"></script>
     <script src="./js/angular-cookies/angular-cookies.js"></script>
+    <script src="./js/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="./views/lobby/lobby.js"></script>
+    <script src="./views/quiz/quiz.js"></script>
+    <script src="./views/home/home.js"></script>
     <script src="./js/app.js"></script>
     <script src="./js/testdata.json"></script>
     <script src="./js/controllers/testdata.json"></script>
     <script src="./js/services/quizService.js"></script>
-<script src="./js/services/userService.js"></script>
+    <script src="./js/services/userService.js"></script>
     <script src="./js/controllers/triviaController.js"></script>
     <script src="./js/controllers/testController.js"></script>
+    <script src="./js/controllers/quizController.js"></script>
+    <script src="./js/controllers/chatController.js"></script>
+    <script src="./js/controllers/homeController.js"></script>
     <script src="./js/controllers/lobbyCtrl.js"></script>
-<script src="./js/controllers/userCtrl.js"></script>
-    <script src="http://localhost:1967/socket.io/socket.io.js"></script>
+    <script src="./js/controllers/userCtrl.js"></script>
+    <script src="http://192.168.1.2:1967/socket.io/socket.io.js"></script>
     <script src="./js/services/socketService.js"></script>
 
 

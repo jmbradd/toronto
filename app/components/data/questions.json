@@ -1,0 +1,23 @@
+{
+  "questions": {
+    "global" : [
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Astoria is named for the John Jacob Astor who owned a fur comapny based at the mouth of the Columbia River", "answer" : true, "explanation" : "With the spectre of the war of 1812 as a backdrop, Astor hired a writer to write a book \"Astoria\" to celebrate the impact of his fur company in the NW."},
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." }
+
+    ],
+    "oregon" : [
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Astoria is named for the John Jacob Astor who owned a fur company based at the mouth of the Columbia River", "answer" : true, "explanation" : "With the spectre of the war of 1812 as a backdrop, Astor hired a writer to write a book \"Astoria\" to celebrate the impact of his fur company in the NW."},
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." },
+      {"text" : "Oregon was originally a Spanish colony as evidenced by place names such as \"Haceta Head\"", "answer" : false, "explanation" : "While there are a lot of Spanish place names in the State of Oregon, it was a US Territory prior to becoming a state." }
+    ]
+  }
+}

@@ -13,7 +13,8 @@ var rooms = [
         "mode": "democracy",
         "isRegional": false,
         "region": null,
-        "maxPlayers": 6
+        "status": "available",
+        "playersPerGame": 1
     },
     {
         "id": 1,
@@ -23,7 +24,8 @@ var rooms = [
         "mode": "autocracy",
         "isRegional": false,
         "region": null,
-        "maxPlayers": 6
+        "status": "available",
+        "playersPerGame": 2
     }
 ];
 var roomList = [];
@@ -34,7 +36,7 @@ var players = [];
 
 module.exports.joinRoom = function(roomID, playerID, callback){
 
-    console.log("player id is " + playerID )
+
 
 
     var _room = _.find(rooms, function(usr) {
@@ -45,7 +47,7 @@ module.exports.joinRoom = function(roomID, playerID, callback){
         return ply.id == playerID
     });
 
-    console.log(_player)
+
 
 
     var playerObj =  {"id" : _player.id,
@@ -62,28 +64,45 @@ module.exports.joinRoom = function(roomID, playerID, callback){
 
     _player.rooms.push(roomObj)
 
-    callback({"room" : roomObj.id, "player" : playerObj})
+    callback({"room" : _room, "player" : playerObj})
 
 
 }
 
 
-module.exports.getRoom = function(roomID){
+module.exports.getRoom = function(roomID, callback){
     //get room from room array
 
-    return room;
-
+    var _room = rooms.filter(function(room){
+        return room.id == roomID;
+    })
+    callback(_room[0])
 };
+
+module.exports.getReadyRoom = function(roomID, callback){
+    var _room = rooms.find(function(room){
+        return room.id == roomID;
+    })
+
+    var gameTemplate = {
+        'id' : Math.floor(Math.random() * 1000),
+        'roomID' : roomID,
+        'playersNeeded' : _room.playersPerGame,
+        players : []
+    }
+
+    callback(gameTemplate);
+}
 
 module.exports.getRooms = function(){
     return rooms;
 };
 
-module.exports.createPlayer = function(id, username, socket){
+module.exports.createPlayer = function(id, username)
+{
     var _player = {
         "id" : id,
         "username" : username,
-        "socketID" : socket,
         "rooms" : []
     };
 
@@ -103,6 +122,7 @@ module.exports.createRoom = function(roomName, gameMode){
         mode: gameMode,
         isRegional: false,
         region: null,
+        status: "available",
         maxPlayers: 6
     };
 
@@ -110,17 +130,58 @@ module.exports.createRoom = function(roomName, gameMode){
     updateRoomList();
 };
 
-module.exports.getPlayer = function(id){
+module.exports.addMessage = function(message)
+{
+    console.log("adding room message")
+    console.log(message);
+    var _room = rooms.filter(function(room){
+        return room.id == message.room;
+    })
+
+    _room[0].messages.push(message)
+}
+
+module.exports.getPlayer = function(id, data, callback){
 
     var _player = players.filter(function(player){
         return player.id == id
     });
 
-    return _player[0];
+    callback({player:_player[0], data:data});
 };
 
-module.exports.getPlayers = function(){
-    return players;
+module.exports.getPlayerSocketID = function(id, callback){
+
+
+
+    var _player = _.find(players, function(player){
+        return player.id == id
+    });
+
+
+   callback(_player.socketID)
+};
+
+module.exports.updatePlayerSocketID = function(playerID, socketID)
+{
+    var _player = _.find(players, function (player) {
+        return player.id == playerID
+    });
+
+    var i = players.indexOf(_player)
+    console.log(i)
+
+}
+
+module.exports.getPlayers = function(roomID, callback){
+
+    var _room = _.find(rooms, function(room)
+    {
+        return room.id == roomID;
+
+    })
+
+    typeof callback === 'function' && callback(_room.players);
 }
 
 var updateRoomList = function(){

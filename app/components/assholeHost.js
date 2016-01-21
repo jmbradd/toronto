@@ -13,3 +13,13 @@ module.exports.getGreeting = function(playerType){
     console.log(_greeting);
     return _greeting;
 }
+
+module.exports.getResponseText = function(isCorrect, callback){
+
+    var choices = hostData.results[isCorrect];
+    var choice = Math.floor(Math.random() * choices.length);
+
+    callback(choices[choice])
+
+
+}
