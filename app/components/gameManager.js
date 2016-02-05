@@ -4,155 +4,29 @@
 
 
 var _ = require('lodash')
-var questions = require('./data/questions');
+var questions = require('./data/questions')
+var gameTypes = require('./data/gametypes')
+
 var games = []
 
 module.exports = function(app, io, mongoose, roomManager, assholeHost)
 {
-    function democracy(id, players, _roomID)
+
+
+    module.exports.createGame = function (gameID, roomID, players, callback)
     {
-        return{
-            self: this,
-
-            //todo: implement unique ID for games
-            id: id,
-            roomID: _roomID,
-            Players: players,
-            teams: {
-                team1: [],
-                team2: []
-            },
-            Questions: [],
-            Answers: [],
-            Scores: {
-                team1: [],
-                team2: []
-            },
-            questionLimit: 5,
-            currentRound: 1,
-
-
-            getQuestions: function (callback)
-            {
-                for ( var i = 0;i<this.questionLimit;i++)
-                {
-                    var question = questions.questions.global[i]
-                    question["round"] = i + 1;
-                    this.Questions.push(question)
-                    console.log("loaded question "+ questions.questions.global[i].text)
-                    if (this.Questions.length == this.questionLimit){
-                        console.log("questions fully loaded!")
-                        callback()
-                    }
-                }
-
-            },
-            nextQuestion: function(){
-                return this.Questions.shift()
-            },
-
-            checkAnswer: function(answer, callback)
-            {
-                var _question = _.find(this.Questions, function(question)
-                {
-
-                    return question.id == answer.questionID
-                });
-
-                if(_question)
-                {
-                    console.log("question is ")
-                    console.log(_question)
-                var _total = this.Answers.length + 1
-
-                if (_total == this.Players.length )
-                {
-                    if (answer.response == _question.answer)
-                    {
-                        answer.points = 1
-                        addScore(answer.gameID, answer.playerID, answer.points)
-                        console.log(answer)
-                        getHostMessage(answer, function()
-                        {
-                            callback("complete")
-                        })
-                    }
-                    else
-                    {
-                        answer.points = 0
-                        addScore(answer.gameID, answer.playerID, answer.points)
-                        getHostMessage(answer, function()
-                        {
-                            callback("complete")
-                        })
-                    }
-
-                }
-                else
-                {
-
-                    if (answer.response == _question.answer)
-                    {
-                        answer.points = 1
-                        addScore(answer.gameID, answer.playerID, answer.points)
-                        getHostMessage(answer, function()
-                        {
-                            callback("pending")
-                        })
-                    }
-                    else
-                    {
-                        answer.points = 0
-                        addScore(answer.gameID, answer.playerID, answer.points)
-                        getHostMessage(answer, function()
-                        {
-                            callback("pending")
-                        })
-                    }
-                }
-            }
-                else
-                {
-                    console.log("no question there!")
-                }
-            },
-
-            submitAnswer : function(answer){
-                this.Answers.push(answer)
-            },
-
-            getResult : function(player, socketID, callback)
-            {
-                var _answer = _.find(this.Answers, function(answer)
-                {
-                    return answer.playerID == player.id
-                });
-
-
-                io.to(player.socketID).emit("quiz:result", _answer)
-
-            },
-            gameComplete: function(){
-                this.Answers = []
-                this.Questions = []
-            }
-        }
-    }
-
-    module.exports.createGame = function (gameID, roomID, players, callback) {
         console.log("creating a quiz")
-        _game = new democracy(gameID, players, roomID);
+        _game = new gameTypes.democracy(gameID, players, roomID, 5);
+        console.log(_game)
         _game.getQuestions(function(){
             console.log("got questions!")
             _game.Scores = players
             games.push(_game)
-            getSanitizedGame(_game, function(gameObj){
+            getSanitizedGame(_game, function(gameObj)
+            {
                 callback(gameObj)
             })
-
         })
-
-
     }
 
     module.exports.getGames = function ()
@@ -172,6 +46,7 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         if(_game)
         {
             _game.checkAnswer(answer, function(result){
+                addScore(answer)
                 callback(result)
             })
 
@@ -183,7 +58,8 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
 
     }
 
-    module.exports.tallyResults = function(gameID){
+    module.exports.tallyResults = function(gameID)
+    {
 
         var _game = _.find(games, function(game)
         {
@@ -194,7 +70,14 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
 
         _.forEach(_game.Answers, function(result, index)
         {
-            io.to(result.socketID).emit("quiz:result", result);
+            console.log(result)
+            getHostMessage(result, function(message){
+                console.log("host message is ", message)
+                result.hostMessage = message
+                console.log(result)
+                io.to(result.socketID).emit("quiz:result", result);
+            })
+
         })
 
         continueGame(gameID)
@@ -211,8 +94,7 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
             var question = _.find(game.Questions, function(question){
                 return question.round == game.currentRound
             })
-            console.log(question)
-            console.log(game.Questions.length)
+
             io.to(game.id).emit("quiz:question", {'question' : question, 'scores' : game.Scores})
         }
         else
@@ -227,6 +109,7 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         game = _.find(games, function(game){
             return game.id == gameID
         })
+
 
         //clear previous rounds answers
         game.Answers = []
@@ -287,30 +170,27 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
 
     var gameOver = function(gameID)
     {
-        _game = _.find(games, function(game){
+        _game = _.find(games, function(game)
+        {
             return game.id == gameID
         })
 
         io.to(_game.id).emit("gameover", _game.Scores)
     }
 
-    var addScore = function(gameID, playerID, score)
+    var addScore = function(answer)
     {
-        console.log("gameID " + gameID)
-        console.log("playerID " + playerID)
-        console.log("score " + score)
-
         var game = _.find(games, function(game){
-            return game.id == gameID
+            return game.id == answer.gameID
         })
 
         var scoreObj = _.find(game.Scores, function(player)
         {
-            console.log(player)
-            return player.playerID == playerID
+
+            return player.playerID == answer.playerID
         })
 
-        scoreObj.score += score
+        scoreObj.score += answer.points
     }
 
 

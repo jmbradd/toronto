@@ -9,7 +9,7 @@ app.factory("userService", function($http, $rootScope, $location, $cookies, sock
 
     service.loggedIn = false
     service.user = {}
-    service.playersConnected = 75
+    service.playersConnected = 0
 
     service.rooms = [];
 
@@ -37,6 +37,10 @@ app.factory("userService", function($http, $rootScope, $location, $cookies, sock
         service.rooms = data.rooms
         console.log(service.loggedIn)
         $location.path(data.redirect);
+    })
+
+    socketService.on("socketcount", function(count){
+        service.playersConnected = count;
     })
 
 

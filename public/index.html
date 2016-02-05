@@ -40,11 +40,11 @@
                      </li> -->
                 </ul>
                 <div class="nav navbar-nav navbar-right" ng-if="!us.loggedIn" style="vertical-align: top;">
-                <ul class="nav navbar-nav navbar-right" >
-                    <li><input ng-model="login.username"/></li>
-                    <li><input ng-model="login.password"/></li>
-                    <li><button class="btn btn-default nav-btn"  ng-click="joinServer(login)">Login</button></li>
-                </ul>
+                    <ul class="nav navbar-nav navbar-right" >
+                        <li><input type="text" ng-model="form.username"/></li>
+                        <li><input type="password" ng-model="form.password"/></li>
+                        <li><button class="btn btn-default nav-btn"  ng-click="login(form)">Login</button></li>
+                    </ul>
                 </div>
 
                 <div class="nav navbar-nav navbar-right" ng-if="us.loggedIn">
@@ -59,6 +59,7 @@
 
 
 
+
     <ng-view></ng-view>
     </div>
     <script src="./js/testdata.json"></script>
@@ -70,6 +71,7 @@
     <script src="./views/lobby/lobby.js"></script>
     <script src="./views/quiz/quiz.js"></script>
     <script src="./views/home/home.js"></script>
+    <script src="./views/register/register.js"></script>
     <script src="./js/app.js"></script>
     <script src="./js/testdata.json"></script>
     <script src="./js/controllers/testdata.json"></script>
@@ -80,9 +82,10 @@
     <script src="./js/controllers/quizController.js"></script>
     <script src="./js/controllers/chatController.js"></script>
     <script src="./js/controllers/homeController.js"></script>
+    <script src="./js/controllers/registerController.js"></script>
     <script src="./js/controllers/lobbyCtrl.js"></script>
     <script src="./js/controllers/userCtrl.js"></script>
-    <script src="http://192.168.1.2:1967/socket.io/socket.io.js"></script>
+    <script src="http://192.168.1.3:1967/socket.io/socket.io.js"></script>
     <script src="./js/services/socketService.js"></script>
 
 

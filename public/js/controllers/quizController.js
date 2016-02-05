@@ -1,7 +1,7 @@
 /**
  * Created by jmbradd on 12/12/2015.
  */
-app.controller("quizController", ['$scope', 'quizService', 'socketService', 'userService', function($scope, quizService, socketService, userService) {
+app.controller("quizController", ['$scope', '$location', 'quizService', 'socketService', 'userService', function($scope, $location, quizService, socketService, userService) {
 
     $scope.qs = quizService
     $scope.questionStatus = "unanswered"
@@ -36,9 +36,9 @@ app.controller("quizController", ['$scope', 'quizService', 'socketService', 'use
             title: "Game Over",
             html: 'hey there is text in here!'
         })
+
+        $location.path("/lobby")
     })
-
-
 
     $scope.$on("quizresult", function()
     {

@@ -9,8 +9,13 @@ var roomManager = require("../components/roomManager");
 var path = require('path');
 var socketManager = ("../components/socketManager")
 var gameManager = require("../components/gameManager")
+var User = require('../models/user')
 
-module.exports = function(app, io){
+
+
+module.exports = function(app, io, passport){
+
+
 
 
 
@@ -20,6 +25,34 @@ module.exports = function(app, io){
         }
 
     });
+
+    app.post('/register', function(req, res, next)
+    {
+        console.log(req.body.username)
+        console.log(req.body.password)
+        User.register(new User({username: req.body.username}),
+            req.body.password,
+            function(err){
+            if(err)
+            {
+                console.log(err)
+                res.status('500').send(err)
+            }
+
+            passport.authenticate('local'),(req,res, function(){
+                res.redirect('/home')
+                })
+        })
+    })
+
+    app.post('/login', passport.authenticate('local'), function(req,res){
+        console.log("User ",req.body.username," logged in!")
+        console.log()
+        req.session.username = req.body.username
+        req.session.save()
+        res.send({username: req.body.username})
+        //login using passport/usermanager
+    })
 
     app.get("/initialize", function(req, res)
     {

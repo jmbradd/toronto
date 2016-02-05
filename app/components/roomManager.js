@@ -105,6 +105,7 @@ module.exports.createPlayer = function(id, username)
         "username" : username,
         "rooms" : []
     };
+    console.log("Player Created", _player)
 
     players.push(_player);
 
@@ -142,6 +143,7 @@ module.exports.addMessage = function(message)
 }
 
 module.exports.getPlayer = function(id, data, callback){
+    console.log("getting player with ID", id)
 
     var _player = players.filter(function(player){
         return player.id == id

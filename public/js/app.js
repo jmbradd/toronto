@@ -7,6 +7,7 @@ var app = angular.module("toronto", [
     'toronto.lobby',
     'toronto.quiz',
     'toronto.home',
+    'toronto.register',
     'ngCookies',
     'SocketService',
     'ui.bootstrap'

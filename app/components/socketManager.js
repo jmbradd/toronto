@@ -7,17 +7,36 @@
 var roomManager = require("../components/roomManager")
 var assholeHost = require("../components/assholeHost")
 var gameManager = require("../components/gameManager")
+var userManager = require("../components/userManager")
 var _ = require('lodash')
-
 var pendingGames = []
+var socketcounter = 0
 
 module.exports = function(app, io, server, sessionStore, sharedsession, sessions){
 
     io.use(sharedsession(sessions));
 
+    /*io.set('authorization', function( handshakeData, accept){
+
+        if(handshakeData.headers.cookie) {
+            handshakeData.cookie = cookies.parse(handshakeData.headers.cookie);
+            handshakeData.sessionID = connect.utils.parseSignedCookie(handshakeData.cookie['express.sid'], 'lol bees')
+
+            if (handshakeData.cookie['express.sid'] == handshakeData.sessionID) {
+                return accept('cookie is invalid', false)
+            }
+        } else {
+            return accept('no cookie transmitted', false)
+        }
+
+        accept(null, true);
+    });
+    */
 
 
     io.on("connection", function(socket){
+        socketcounter += 1
+        io.emit("socketcount", socketcounter)
         console.log("user connected");
         socket.rejoinRooms = function()
         {
@@ -33,9 +52,10 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
             console.log("Returning User " + socket.handshake.session.username)
             socket.handshake.session.socketID = socket.id
+            console.log("Session Info", socket.handshake.session)
             roomManager.updatePlayerSocketID(socket.handshake.sessionID, socket.id)
             socket.handshake.session.save()
-            console.log(socket.handshake.session.rooms)
+            console.log("Currently in ",socket.handshake.session.rooms)
             var userObj = {
                 "username" : socket.handshake.session.username,
                 "socketID" : socket.id,
@@ -57,13 +77,13 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
         }
 
-        socket.on("bindsession", function(data)
+        socket.on("bindsession", function(username)
         {
-            console.log(data)
-            console.log("Binding socket " + socket.id + " and session " + socket.handshake.sessionID )
+
+            console.log("Binding socket " + socket.id + " and session " + socket.handshake.sessionID + " for user ", socket.handshake.session.username )
             socket.handshake.session.socketID = socket.id
-            socket.handshake.session.username = data.username
             socket.handshake.session.rooms = []
+            socket.handshake.session.username = username
             socket.handshake.session.save()
 
             var player = roomManager.createPlayer(socket.handshake.sessionID, socket.handshake.session.username, socket.id)
@@ -213,7 +233,8 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
             answer.socketID = socket.id
             gameManager.checkAnswer(answer,function(response)
             {
-                    if (response == "complete")
+                console.log(response)
+                    if (response.status == "complete")
                     {
                         console.log("complete")
                         console.log("Room answer ID is" + answer.gameID)
@@ -234,6 +255,8 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
         socket.on("logout", function()
         {
+            socketcounter -= 1
+            io.emit("socketcount", socketcounter)
             console.log("logout!")
             console.log(socket.handshake.session)
             io.to(socket.id).emit("redirect", {"redirect" : "/"})
@@ -244,10 +267,10 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
     })
 
+    //temporary route to troubleshoot the pending game workflow
     app.get("/pendinggames", function(req, res){
         res.json(pendingGames)
     })
-
 
 
 
