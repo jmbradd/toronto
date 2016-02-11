@@ -45,12 +45,12 @@ app.use(bodyParser.urlencoded({'extended' : 'true'}));
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json'}));
 app.use(cors());
-app.use(passport.initialize())
-app.use(passport.session())
 var User = require('./app/models/user')
 passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 /**io.use(sharedsession(sessions, {
@@ -82,28 +82,6 @@ mongoose.connection.on('error', function (err) {
     console.log(err);
 });
 
-/** io.on('connection', function(socket){
-
-    console.log("welcome, friend")
-    console.log(socket.handshake.sessionID)
-    socket.handshake.session.socketID = socket.handshake.sessionID;
-    socket.handshake.session.save(function(err){
-        console.log(err)
-    });
-
-    socket.on('player:bind', function(data){
-        console.log(data);
-        var sess = sessionStore.get(data);
-        sess.socketID = socket.id;
-        sess.save(function(err){
-            console.log(err);
-        })
-    })
-
-
-});
-
-*/
 
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);

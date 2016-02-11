@@ -9,6 +9,7 @@ var assholeHost = require("../components/assholeHost")
 var gameManager = require("../components/gameManager")
 var userManager = require("../components/userManager")
 var _ = require('lodash')
+var Game = require("../models/game")
 var pendingGames = []
 var socketcounter = 0
 
@@ -77,13 +78,16 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
         }
 
-        socket.on("bindsession", function(username)
+        socket.on("bindsession", function(userdata)
         {
+            console.log("userdata arrived",userdata)
+            console.log(socket.handshake.session)
 
             console.log("Binding socket " + socket.id + " and session " + socket.handshake.sessionID + " for user ", socket.handshake.session.username )
             socket.handshake.session.socketID = socket.id
             socket.handshake.session.rooms = []
-            socket.handshake.session.username = username
+            socket.handshake.session.username = userdata.username
+            socket.handshake.session.passportid = userdata.passportid
             socket.handshake.session.save()
 
             var player = roomManager.createPlayer(socket.handshake.sessionID, socket.handshake.session.username, socket.id)
@@ -144,12 +148,11 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
         })
 
         socket.on("game:create", function(data){
-            //todo: write this shit
-
             console.log("starting game!")
             console.log(data)
+            console.log("session info", socket.handshake.session)
 
-            roomManager.getReadyRoom(data.id, function(gameObj)
+            roomManager.getReadyRoom(data.id, socket.handshake.session.passportid, function(gameObj)
             {
 
                 pendingGames.push(gameObj)
@@ -169,6 +172,7 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
             {
                 console.log("found game!")
                 data.player.score = 0
+                //add player to all players
                 game.players.push(data.player)
                 socket.join(game.id)
                 if(game.players.length == data.room.playersPerGame)
@@ -177,8 +181,7 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
                     console.log(game)
                     gameManager.createGame(game.id, game.roomID, game.players, function(gameObj)
                     {
-                        console.log("quiz created, sending questions to clients")
-                        console.log("Getting the room and sending questions to clients");
+                        console.log("game created, sorting into teams")
                         io.to(gameObj.id).emit("quiz:started", gameObj)
                         gameManager.startGame(gameObj.id)
                     })
@@ -210,9 +213,29 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
             })
             if(game)
             {
-                console.log(game)
-                game.players = _.without(game.players, data.player.id)
+                console.log(data)
+                game.players = _.without(game.players, _.findWhere(game.players, {playerID: data.player.playerID } ))
                 io.to(game.roomID).emit("player:gameleft", game.id)
+                console.log(game.players.length)
+                if (game.players.length <= 0)
+                {
+                    console.log("game is now empty, aborting")
+                    Game.update({_id: game.id},
+                        {
+                            status: "aborted",
+                            updated_at: new Date()
+                        },
+                        function(err)
+                        {
+                            if (err)
+                            {
+                                console.log(err)
+                            }
+                            console.log("Game ", game.id, " was successfully aborted")
+                        })
+
+                }
+
             }
         })
 

@@ -6,6 +6,7 @@
 var _ = require('lodash')
 var questions = require('./data/questions')
 var gameTypes = require('./data/gametypes')
+var Game = require('../models/game')
 
 var games = []
 
@@ -17,15 +18,21 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
     {
         console.log("creating a quiz")
         _game = new gameTypes.democracy(gameID, players, roomID, 5);
-        console.log(_game)
         _game.getQuestions(function(){
-            console.log("got questions!")
-            _game.Scores = players
-            games.push(_game)
-            getSanitizedGame(_game, function(gameObj)
-            {
-                callback(gameObj)
+            console.log("got questions!, time to sort out teams")
+            _game.sortTeams(function(){
+                _game.Scores.team1 = _game.teams.team1.members
+                _game.Scores.team2 = _game.teams.team2.members
+                console.log("teams sorted, notifying players")
+                notifyPlayers(_game.teams)
+                games.push(_game)
+                getSanitizedGame(_game, function(gameObj)
+                {
+                    callback(gameObj)
+                })
+
             })
+
         })
     }
 
@@ -40,6 +47,7 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
 
         var _game = _.find(games, function(game)
         {
+            console.log(game)
             return game.id == answer.gameID
         });
 
@@ -175,22 +183,60 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
             return game.id == gameID
         })
 
+        Game.update({_id: _game.id},
+            {
+                status: "Complete",
+                Scores: _game.Scores,
+                updated_at: new Date()
+            }, function(err)
+            {
+                if(err)
+                {
+                    console.log(err)
+                }
+
+                console.log("game ",_game.id," saved!")
+            })
+
+
+
         io.to(_game.id).emit("gameover", _game.Scores)
     }
 
     var addScore = function(answer)
     {
+        //debugging
+        console.log(answer)
         var game = _.find(games, function(game){
             return game.id == answer.gameID
         })
+        var team = answer.team
 
-        var scoreObj = _.find(game.Scores, function(player)
+
+        var scoreObj = _.find(game.Scores[team], function(player)
         {
 
             return player.playerID == answer.playerID
         })
 
         scoreObj.score += answer.points
+    }
+
+    var notifyPlayers = function(teams)
+    {
+        for (var i= 0; i < teams.team1.members.length; i++)
+        {
+            player = teams.team1.members[i]
+            console.log("notifying player ", player.username, "has been assigned to ", player.team)
+            io.to(player.socketID).emit("teamassignment", player.team)
+        }
+        for (var i= 0; i < teams.team2.members.length; i++)
+
+        {
+            player = teams.team2.members[i]
+            console.log("notifying player ", player.username, "has been assigned to ", player.team)
+            io.to(player.socketID).emit("teamassignment", player.team)
+        }
     }
 
 

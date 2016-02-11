@@ -2,6 +2,7 @@
  * Created by jmbradd on 11/23/2015.
  */
 var _ = require('lodash')
+var Game = require("../models/game")
 
 
 var rooms = [
@@ -79,19 +80,35 @@ module.exports.getRoom = function(roomID, callback){
     callback(_room[0])
 };
 
-module.exports.getReadyRoom = function(roomID, callback){
+module.exports.getReadyRoom = function(roomID, playerID, callback){
     var _room = rooms.find(function(room){
         return room.id == roomID;
     })
 
-    var gameTemplate = {
-        'id' : Math.floor(Math.random() * 1000),
-        'roomID' : roomID,
-        'playersNeeded' : _room.playersPerGame,
-        players : []
-    }
+    var _game = new Game(
+        {
+            initiatedBy: playerID,
+            status: "Pending"
+        })
 
-    callback(gameTemplate);
+    _game.save(function(err, game){
+        console.log(game)
+
+        var gameTemplate =
+        {
+            initiatedBy: playerID,
+            status: "Pending",
+            'id' : game.id,
+            'roomID' : roomID,
+            'playersNeeded' : _room.playersPerGame,
+            players : []
+        }
+
+        callback(gameTemplate);
+
+
+    })
+
 }
 
 module.exports.getRooms = function(){

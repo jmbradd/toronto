@@ -4,6 +4,7 @@
 
 var _ = require('lodash')
 
+
 module.exports.Game = function()
 {
         //basic game attributes
@@ -11,8 +12,14 @@ module.exports.Game = function()
         this.roomID = "",
         this.Players = "",
         this.teams = {
-            team1: [],
-            team2: []
+            team1: {
+                captain: null,
+                members: []
+            },
+            team2: {
+                captain: null,
+                members: []
+            },
         },
         this.Questions = [],
         this.Answers = [],
@@ -61,7 +68,7 @@ module.exports.Game = function()
                     var _total = this.Answers.length + 1
 
 
-                    if (_total == this.Players.length)
+                    if (_total == (this.teams.team1.members.length + this.teams.team2.members.length))
                     {
                         answer.status = "complete"
                         if (answer.response == _question.answer)
@@ -113,6 +120,44 @@ module.exports.Game = function()
                     });
 
                     io.to(player.socketID).emit("quiz:result", _answer)
+
+                }
+                this.sortTeams = function(callback)
+                {
+                    for(var i=this.Players.length; i>0; i--)
+                    {
+                        console.log("here yo are...")
+
+                        var rand = Math.floor(Math.random() * this.Players.length)
+                        _player = this.Players.splice(rand, 1)
+                        _player = {
+                            username: _player[0].username,
+                            socketID: _player[0].socketID,
+                            playerID: _player[0].playerID,
+                            score: 0
+                            }
+                        console.log("now sorting",_player) 
+                        if(this.teams.team1.members.length > this.teams.team2.members.length)
+                        {
+                            console.log("adding", _player.username," to team 2")
+                            _player.team = "team2"
+                            //io.to(_player.socketID).emit("teamassignment", "team2")
+                            this.teams.team2.captain = this.teams.team2.captain || _player
+                            this.teams.team2.members.push(_player)
+                        }
+                        else
+                        {
+                            console.log("adding", _player.username," to team 1")
+                            _player.team = "team1"
+                            //io.to(_player.socketID).emit("teamassignment", "team1")
+                            this.teams.team1.captain = this.teams.team1.captain || _player
+                            this.teams.team1.members.push(_player)
+                        }
+                        if (this.Players.length <= 0)
+                        {
+                            callback()
+                        }
+                    }
 
                 }
 

@@ -6,31 +6,30 @@ app.controller("userCtrl", ['$scope', '$rootScope', '$http', 'quizService', 'use
     $scope.us = userService
     $scope.username = ""
 
-    $scope.login = function(data)
+
+    $scope.register = function()
     {
-        $scope.username = data.username
-        $http.post('http://localhost:1967/login', data).success(function(err, code, data){
-
-            console.log("Response Code", code)
-            console.log("Is there a third callback?", data)
-            if(code === 200){
-                console.log("login success!!")
-                socketService.emit("bindsession", $scope.username)
-            }
-
-        }).error(function(err){
-            $scope.username = ""
-            swal(
-                {   title: "Login Failed",
-                    text: err,
-                    timer: 5000
-                })
-        })
-
+        $location.path('/register')
     }
 
-    $scope.register = function(){
-        $location.path('/register')
+    $scope.login = function(data)
+    {
+        $scope.us.login(data, function(response){
+            console.log(response)
+            if(response.rescode == 200)
+            {
+                $scope.username = response.username
+                socketService.emit("bindsession", {username: response.resdata.username, passportid: response.resdata.passportid})
+
+            }
+            else
+            {
+                swal({title: "Error", text: response})
+            }
+
+            console.log(response)
+        })
+
     }
 
 

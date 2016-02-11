@@ -10,6 +10,7 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
 
     var service = {}
     service.rooms = []
+    service.team = ""
     service.question = {}
     service.questionStatus = ""
     service.currentRoom = ""
@@ -25,7 +26,7 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
 
     service.getPlayers = function(room)
     {
-        //this function is not yet implimented and may end up deleted
+        //this function is not yet implemented and may end up deleted
         return players;
     };
 
@@ -83,7 +84,7 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
         service.questionStatus = "answered"
         service.answerpending = true
         console.log("sending response to room "+ service.currentGame.id)
-        socketService.emit("quiz:answer", {"gameID" : service.currentGame.id, "questionID" : service.question.uid, "response" : answer, "playerID" : playerID })
+        socketService.emit("quiz:answer", {"gameID" : service.currentGame.id, "team" : service.team, "questionID" : service.question.uid, "response" : answer, "playerID" : playerID })
     }
 
     service.answer = function(response){
@@ -114,6 +115,11 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
         console.log(data.player.username + "has joined room " + data.room.id)
         service.rooms[data.room.id].players.push(data.player)
         service.rooms[data.room.id].status = "joined";
+    })
+
+    socketService.on("teamassignment", function(team){
+        console.log("welcome to ", team)
+        service.team = team
     })
 
     socketService.on("rejoin:allrooms", function(rooms)

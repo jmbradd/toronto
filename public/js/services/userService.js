@@ -26,6 +26,26 @@ app.factory("userService", function($http, $rootScope, $location, $cookies, sock
 
     };
 
+    service.login = function(data, callback)
+    {
+
+        $http.post('http://localhost:1967/login', data)
+            .success(function(response, code)
+            {
+                console.log("response is",response)
+                service.user.username = response.username
+                service.user.passportid = response.passportid
+                callback({resdata: response, rescode: code})
+
+             })
+            .error(function(err, code) {
+                console.log(err)
+                console.log(code)
+                callback(err)
+            })
+
+    }
+
 
 
     socketService.on("userdata", function(data){

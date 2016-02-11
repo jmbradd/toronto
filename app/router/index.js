@@ -45,15 +45,29 @@ module.exports = function(app, io, passport){
         })
     })
 
-    app.post('/login', passport.authenticate('local'), function(req,res){
-        console.log("User ",req.body.username," logged in!")
-        console.log()
-        req.session.username = req.body.username
-        req.session.save()
-        res.send({username: req.body.username})
-        //login using passport/usermanager
+    app.post('/login',
+        passport.authenticate('local'),
+        function(req,res) {
+            console.log("user id is ",req.user.id)
+            req.session.passportid = req.user.id
+            req.session.save(function(){
+                res.send({username: req.user.username, passportid: req.user.id})
+            })
+
     })
 
+            /*console.log("User ",req.body.username," logged in!")
+            console.log()
+            req.session.username = req.body.username
+            console.log("Passport id is",req.user.id)
+            req.session.passportid = req.user.id
+            req.session.save()
+            console.log(req.user)
+            res.send({username: req.body.username, passportid: req.user.id})
+            //login using passport/usermanager
+        })
+    })
+*/
     app.get("/initialize", function(req, res)
     {
         if(req.session.username)

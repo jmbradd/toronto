@@ -16,8 +16,6 @@ var gameProto = require('.././models/game').Game
        Democracy.prototype  = Object.create(gameProto.prototype)
         Democracy.prototype.constructor = Democracy;
         var game = new Democracy()
-        console.log("Is game an instance of Democracy?", game instanceof Democracy)
-        console.log(game)
         game.id = id
         game.Players = players
         game.roomID = roomID
@@ -26,7 +24,7 @@ var gameProto = require('.././models/game').Game
         {
             console.log("looping")
                 for (var i = 0; i < this.questionLimit; i++) {
-                    console.log("iteration ",i)
+
                     var question = questions.questions.global[i]
                     question["round"] = i + 1;
                     this.Questions.push(question)
