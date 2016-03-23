@@ -14,13 +14,40 @@
       {"type" : "friendly", "text" : "Great work!"},
       {"type" : "friendly", "text" : "Wow that was amazing"},
       {"type" : "mean", "text" : "Are you fucking kidding me?  You call that a question?  Wow.  Take your points."},
-      {"type" : "mean", "text" : "Wow, cool...you got it right...Still won't make that phone ring"}
+      {"type" : "mean", "text" : "Wow, cool...you got it right...Still won't make that phone ring"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"},
+      {"type" : "DPRK", "text" : "An eye catching miracle"}
+
+
     ],
     "incorrect" : [
       {"type" : "friendly", "text" : "Dang, i'm sure you'll get it next time"},
       {"type" : "friendly", "text" : "Wow that was a hard one."},
       {"type" : "mean", "text" : "Not looking so how now are ya?"},
       {"type" : "mean", "text" : "http://lmgtfy.com/?q=dumb"}
+    ],
+    "victory" : [
+      {"type" : "friendly", "text" : "You did it!!!"},
+      {"type" : "DPRK", "text" : "Nothing is more foolish than dropping a hunting gun before herds of ferocious wolves"},
+      {"type" : "DPRK", "test" : "You are wise like the DPRK, a responsible nuclear weapons state"}
+
+    ],
+    "defeat" : [
+      {"type" : "friendly", "text" : "Hey sport, sorry we missed your ball game."}
     ]
   }
 }

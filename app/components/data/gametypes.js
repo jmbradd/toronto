@@ -4,6 +4,9 @@
 var _ = require('lodash')
 var questions = require('./questions')
 var gameProto = require('.././models/game').Game
+var mongoose = require('mongoose')
+var io = require("socket.io")
+
 
 
     module.exports.democracy = function democracy(id, players, roomID, questionLimit){
@@ -17,9 +20,27 @@ var gameProto = require('.././models/game').Game
         Democracy.prototype.constructor = Democracy;
         var game = new Democracy()
         game.id = id
+        //todo: fix the number of teams issue, this is a minor issue but a hindrance to progress so i'm hard coding to 1
+        game.numTeams = 1
         game.Players = players
         game.roomID = roomID
         game.questionLimit = questionLimit
+        game.round = {
+            "question" : {},
+            "team1" :
+                {"true" : 0,
+                "false" : 0}
+            ,
+            "team2" :
+                {"true" : 0,
+                "false" : 0}
+
+        }
+        game.Scores = {
+            'team1' : 0,
+            'team2' : 0
+        }
+
         game.getQuestions = function (callback)
         {
             console.log("looping")
@@ -36,6 +57,217 @@ var gameProto = require('.././models/game').Game
                 }
 
 
+        }
+        game.submitAnswer = function(answer, callback)
+        {
+            console.log(this.id, "is logging an answer")
+            game.answerBox.push(answer)
+            if(game.answerBox.length == game.Players.length)
+            {
+               callback("complete")
+            }
+
+            else
+            {
+               callback("pending")
+            }
+        }
+
+        game.endRound = function(callback)
+        {
+            console.log(game.id, "is ending a round")
+            console.log("checking answers for correctness")
+            game.checkAnswers(function()
+            {
+                console.log("answers checked!  Tallying scores")
+                var team1 = null
+                var team2 = null
+
+                /*
+
+                if(game.round.team1.true > game.round.team1.false)
+                {
+                    console.log("team 1 says true!")
+                    team1 = true
+                }
+                else
+                {
+                    console.log("team 1 says false!")
+                    team1 = false
+                }
+
+                if(game.round.team2.true > game.round.team2.false)
+                {
+                    team2 = true
+                }
+                else
+                {
+                    console.log("team 1 says false!")
+                    team2 = false
+                }
+                */
+                var counter = 0
+
+                //todo: fix this shit
+
+                _.forEach(game.Scores, function(team)
+                {
+                    var currentTeam = "team"+(counter+1)
+                    console.log("current team being evaluated is: ", currentTeam)
+                    console.log("true votes",game.round[currentTeam].true)
+                    console.log("false votes", game.round[currentTeam].false)
+                    if(game.round[currentTeam].true > game.round[currentTeam].false)
+                    {
+                        console.log(currentTeam," says true!")
+                        _answer = true
+
+                        console.log("answer is", game.round.question.answer)
+                        if(_answer == game.round.question.answer)
+                        {
+                            game.Scores[currentTeam]++
+                            if(counter == game.numTeams)
+                            {
+                                callback(game.scores)
+                            }
+
+                            else
+                            {
+                                counter++
+                            }
+                        }
+
+                        else
+                        {
+                            if(counter == game.numTeams)
+                            {
+                                callback(game.scores)
+                            }
+
+                            else
+                            {
+                                counter++
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        console.log(currentTeam," says false!")
+                        _answer = false
+                        if(_answer == game.round.question.answer)
+                        {
+                            game.Scores[currentTeam]++
+
+                            if(counter == game.numTeams)
+                            {
+                                callback(game.scores)
+                            }
+
+                            else
+                            {
+                                counter++
+                            }
+
+                        }
+
+                        else
+                        {
+                            if(counter == game.numTeams)
+                            {
+                                callback(game.scores)
+                            }
+
+                            else
+                            {
+                                counter++
+                            }
+                        }
+                    }
+                })
+                /*
+
+                if(team1 == game.round.question.answer)
+                {
+                    console.log("team1 got it right")
+                    game.Scores.team1++
+                }
+                if(team2 == game.round.question.answer)
+                {
+                    game.Scores.team2++
+                    console.log("calling back results!")
+                    callback(game.Scores)
+                }
+                else
+                {
+                    console.log("calling back results!")
+                    callback(game.Scores)
+                }
+                */
+
+            })
+
+
+        }
+        game.checkAnswers = function(callback)
+        {
+            console.log("checking answers for the DEMOCRACY game mode")
+            var evalprogress = 0
+
+            for(answer in game.answerBox)
+            {
+                console.log("checking", answer)
+                var ans = game.answerBox[answer]
+                console.log(ans)
+                if (ans.team == "team1")
+                {
+                    if(ans.response == true)
+                    {
+                        console.log("it correctly identified team1 as true!")
+                        game.round.team1.true++
+                        evalprogress++
+                    }
+                    else
+                    {
+                        game.round.team1.false++
+                        evalprogress++
+                    }
+                }
+
+                else
+                {
+                    // do team 2 stuff duh
+                    if(ans.response == true)
+                    {
+                        game.round.team2.true++
+                        evalprogress++
+                    }
+                    else
+                    {
+                        game.round.team2.false++
+                        evalprogress++
+                    }
+                }
+                if (evalprogress == game.Players.length)
+                {
+                    console.log("everything is done")
+                    callback()
+                }
+            }
+
+        }
+
+        game.resetRound = function()
+        {
+            game.round = {
+                "question" : {},
+                "team1" :
+                {"true" : 0,
+                    "false" : 0}
+                ,
+                "team2" :
+                {"true" : 0,
+                    "false" : 0}
+            }
         }
 /*
         game.checkAnswer = function (answer, callback)

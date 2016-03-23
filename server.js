@@ -21,6 +21,7 @@ var roomManager = require('./app/components/roomManager')
 var gameManager = require('./app/components/gameManager')(app,io,mongoose, roomManager, assholeHost)
 var userManager = require('./app/components/userManager')(app,io,mongoose)
 var redis = require('redis')
+var User = require('./app/models/user')
 
 var client = redis.createClient()
 var sessionStore = new RedisStore({ host: 'localhost', port: 6379, client: client,  ttl : 10000});
@@ -45,7 +46,6 @@ app.use(bodyParser.urlencoded({'extended' : 'true'}));
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json'}));
 app.use(cors());
-var User = require('./app/models/user')
 passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())

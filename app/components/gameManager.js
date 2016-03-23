@@ -2,7 +2,6 @@
  * Created by jmbradd on 12/12/2015.
  */
 
-
 var _ = require('lodash')
 var questions = require('./data/questions')
 var gameTypes = require('./data/gametypes')
@@ -12,8 +11,6 @@ var games = []
 
 module.exports = function(app, io, mongoose, roomManager, assholeHost)
 {
-
-
     module.exports.createGame = function (gameID, roomID, players, callback)
     {
         console.log("creating a quiz")
@@ -21,8 +18,8 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         _game.getQuestions(function(){
             console.log("got questions!, time to sort out teams")
             _game.sortTeams(function(){
-                _game.Scores.team1 = _game.teams.team1.members
-                _game.Scores.team2 = _game.teams.team2.members
+               //_game.Scores.team1 = _game.teams.team1.members
+               // _game.Scores.team2 = _game.teams.team2.members
                 console.log("teams sorted, notifying players")
                 notifyPlayers(_game.teams)
                 games.push(_game)
@@ -41,27 +38,39 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         return games;
     }
 
-    module.exports.checkAnswer = function(answer, callback)
+    module.exports.submitAnswer = function(answer, callback)
     {
-        console.log(answer)
+        console.log("game manager has recieved an answer")
 
         var _game = _.find(games, function(game)
         {
-            console.log(game)
             return game.id == answer.gameID
         });
 
         if(_game)
         {
-            _game.checkAnswer(answer, function(result){
-                addScore(answer)
-                callback(result)
+            _game.submitAnswer(answer, function(status){
+               if(status == "complete")
+               {
+                   _game.endRound(function(scores)
+                   {
+                       callback(scores)
+                   })
+
+               }
+               else
+               {
+                   console.log("answer recieved but we still need more responses")
+                   callback("pending")
+               }
             })
 
         }
+
         else
         {
-            console.log("how did you get here? that game doesn't exist")
+            console.log("cannot find game ",answer.gameID)
+            callback("error")
         }
 
     }
@@ -75,8 +84,7 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         })
 
 
-
-        _.forEach(_game.Answers, function(result, index)
+        _.forEach(_game.AnswerBox, function(result, index)
         {
             console.log(result)
             getHostMessage(result, function(message){
@@ -91,7 +99,8 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         continueGame(gameID)
     }
 
-    module.exports.startGame = function(gameID){
+    module.exports.startGame = function(gameID)
+    {
 
         game = _.find(games, function(game){
             return game.id == gameID
@@ -103,6 +112,8 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
                 return question.round == game.currentRound
             })
 
+            game.round.question = question
+
             io.to(game.id).emit("quiz:question", {'question' : question, 'scores' : game.Scores})
         }
         else
@@ -111,27 +122,29 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
         }
     }
 
-    var continueGame = function(gameID)
+    module.exports.continueGame = function(gameID)
     {
         console.log("game " + gameID + " is moving on to the next round")
         game = _.find(games, function(game){
             return game.id == gameID
         })
 
-
         //clear previous rounds answers
-        game.Answers = []
+        game.answerBox = []
         game.currentRound += 1
+        game.resetRound()
 
         if (game.currentRound > game.questionLimit)
         {
             gameOver(gameID)
         }
+
         else
         {
             _question =  _.find(game.Questions, function(question){
                 return question.round == game.currentRound
             })
+            game.round.question = _question
             io.to(game.id).emit("quiz:question", {'question' : _question, 'scores' : game.Scores})
         }
 
@@ -198,6 +211,10 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
                 console.log("game ",_game.id," saved!")
             })
 
+        _.remove(games, function(game){
+            return game.id == _game.id
+        })
+
 
 
         io.to(_game.id).emit("gameover", _game.Scores)
@@ -224,6 +241,7 @@ module.exports = function(app, io, mongoose, roomManager, assholeHost)
 
     var notifyPlayers = function(teams)
     {
+        console.log(teams)
         for (var i= 0; i < teams.team1.members.length; i++)
         {
             player = teams.team1.members[i]

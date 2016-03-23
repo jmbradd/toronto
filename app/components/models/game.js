@@ -25,13 +25,13 @@ module.exports.Game = function()
         this.Answers = [],
         this.Scores =
         {
-            team1 : [],
-            team2 : []
+            team1 : 0,
+            team2 : 0
         },
-
+        this.answerBox = [],
         this.questionLimit = 0,
         this.currentRound = 1,
-
+        this.round = {},
             // functions
             this.getSanitizedGame = function(){
                 return {
@@ -39,7 +39,7 @@ module.exports.Game = function()
                     "roomID" : roomID,
                     "players" : players,
                     "teams" : teams,
-                    "scores" : scores
+                    "scores" : this.Scores
                 }
             },
 
@@ -64,11 +64,10 @@ module.exports.Game = function()
 
                 if (_question)
                 {
+                    this.submitAnswer(answer)
 
-                    var _total = this.Answers.length + 1
 
-
-                    if (_total == (this.teams.team1.members.length + this.teams.team2.members.length))
+                    if (this.Answers.length == (this.teams.team1.members.length + this.teams.team2.members.length))
                     {
                         answer.status = "complete"
                         if (answer.response == _question.answer)
@@ -124,7 +123,81 @@ module.exports.Game = function()
                 }
                 this.sortTeams = function(callback)
                 {
-                    for(var i=this.Players.length; i>0; i--)
+                    //I get it, this is a bit hacky but whatever, need to move on to the rest of the program =)
+                    var team1Done = false
+                    var team2Done = false
+
+                    console.log(this.Players)
+                    var players = _.shuffle(this.Players)
+                    console.log("Players",players)
+                    //split array based on number of players.  Using ceiling so that 1 player games don't crash.  Team 2 is better though.
+
+                    this.teams.team1.members.push(_.first(players, Math.ceil(players.length/2)))
+                    this.teams.team2.members = _.rest(players, Math.ceil(players.length/2))
+
+                    console.log("players",this.teams.team1.members)
+                    console.log("team2 length", this.teams.team2.members)
+
+
+
+                    if( this.teams.team1.members)
+                    {
+                        console.log("teamlength",this.teams.team1.members.length)
+                        var capt1 = Math.floor(Math.random() *( this.teams.team1.members.length))
+                        console.log(capt1)
+                        console.log(this.teams.team1.members[capt1])
+                        this.teams.team1.captain = this.teams.team1.members[capt1]
+                        this.teams.team1.members[capt1].isCaptain = true
+                        for(player in this.teams.team1.members)
+                        {
+                            _player =  this.teams.team1.members[player]
+                            _player.team = "team1"
+                          //  io.to(_player.socketID).emit("teamassignment", "team1")
+                            if(_player == this.teams.team1.members.length)
+                            {
+                                team1Done = true
+                                if(team2Done == true)
+                                {
+                                    callback()
+                                }
+                            }
+                        }
+                    }
+
+                    if( this.teams.team2.members.length > 0)
+                    {
+                        var capt2 = Math.floor(Math.random() *( this.teams.team2.members.length))
+                        this.teams.team2.captain = this.teams.team2.members[capt2]
+                        this.teams.team2.members[capt2].isCaptain = true
+                        for(player in this.teams.team2.members)
+                        {
+                            console.log(player)
+                            _player =  this.teams.team2.members[player]
+                            _player.team = "team2"
+                           // io.to(_player.socketID).emit("teamassignment", "team2")
+
+                            if(_player == this.teams.team2.members.length)
+                            {
+                                team2Done = true
+                                if(team1Done == true)
+                                {
+                                    callback()
+                                }
+                            }
+
+                        }
+                    }
+
+                    callback()
+
+
+
+
+
+
+                    //going to take a different approach, thanks to Brian's suggestion! Keeping this in here just in case I hate it
+
+                    /*for(var i=this.Players.length; i>0; i--)
                     {
                         console.log("here yo are...")
 
@@ -136,7 +209,7 @@ module.exports.Game = function()
                             playerID: _player[0].playerID,
                             score: 0
                             }
-                        console.log("now sorting",_player) 
+                        console.log("now sorting",_player)
                         if(this.teams.team1.members.length > this.teams.team2.members.length)
                         {
                             console.log("adding", _player.username," to team 2")
@@ -157,7 +230,7 @@ module.exports.Game = function()
                         {
                             callback()
                         }
-                    }
+                    }*/
 
                 }
 

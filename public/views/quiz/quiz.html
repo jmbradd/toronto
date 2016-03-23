@@ -6,12 +6,10 @@
                 <div class="pull-left">
                     <h2>Current Scores</h2>
                     <ul>
-                        <li>Team 1</li>
-                        <li ng-repeat="score in qs.currentScores.team1 | orderBy: score.score"><i ng-if="score.isCaptain" class="fa fa-ship"></i>{{score.username}} {{score.score}}</li>
+                        <li>Team 1: {{qs.currentScores.team1}}</li>
                     </ul>
                     <ul>
-                        <li>Team 2</li>
-                        <li ng-repeat="score in qs.currentScores.team2 | orderBy: score.score">{{score.username}} {{score.score}}</li>
+                        <li>Team 2: {{qs.currentScores.team2}}</li>
                     </ul>
 
                 </div>

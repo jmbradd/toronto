@@ -154,7 +154,6 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
             roomManager.getReadyRoom(data.id, socket.handshake.session.passportid, function(gameObj)
             {
-
                 pendingGames.push(gameObj)
             })
 
@@ -181,7 +180,11 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
                     console.log(game)
                     gameManager.createGame(game.id, game.roomID, game.players, function(gameObj)
                     {
-                        console.log("game created, sorting into teams")
+                        console.log("game created!")
+                        _.remove(pendingGames, function(pendingGame)
+                        {
+                            return pendingGame.roomID == data.room.id
+                        })
                         io.to(gameObj.id).emit("quiz:started", gameObj)
                         gameManager.startGame(gameObj.id)
                     })
@@ -253,25 +256,19 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
 
         socket.on("quiz:answer", function(answer)
         {
-            answer.socketID = socket.id
-            gameManager.checkAnswer(answer,function(response)
+            console.log("answer received for game ", answer.gameID)
+            gameManager.submitAnswer(answer,function(status)
             {
-                console.log(response)
-                    if (response.status == "complete")
-                    {
-                        console.log("complete")
-                        console.log("Room answer ID is" + answer.gameID)
-                        gameManager.tallyResults(answer.gameID)
+                if(status == "pending")
+                {
+                    io.to(socket.id).emit("quiz:result", "pending")
+                }
+                else
+                {
+                    console.log("status")
+                    gameManager.continueGame(answer.gameID)
+                }
 
-                    }
-                    else
-                    {
-                        console.log("pending!!!")
-                        //send a "proccessing" response
-                        console.log(answer)
-
-                        io.to(socket.handshake.session.socketID).emit("quiz:result", "pending")
-                    }
             })
 
         })
@@ -286,8 +283,6 @@ module.exports = function(app, io, server, sessionStore, sharedsession, sessions
             socket.handshake.session.destroy();
 
         })
-
-
     })
 
     //temporary route to troubleshoot the pending game workflow

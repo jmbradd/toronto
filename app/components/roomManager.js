@@ -15,7 +15,7 @@ var rooms = [
         "isRegional": false,
         "region": null,
         "status": "available",
-        "playersPerGame": 1
+        "playersPerGame": 2
     },
     {
         "id": 1,
@@ -92,7 +92,7 @@ module.exports.getReadyRoom = function(roomID, playerID, callback){
         })
 
     _game.save(function(err, game){
-        console.log(game)
+        console.log("new game created, ID is: ",game.id)
 
         var gameTemplate =
         {

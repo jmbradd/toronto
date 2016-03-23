@@ -19,7 +19,7 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
     service.questionAnswered = false
     service.gameOver = false
     service.currentGame = {}
-    service.currentScores = []
+    service.currentScores = {}
 
 
     //Methods for retrieving data from the service
@@ -38,7 +38,7 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
 
     service.joinServer = function(){
         var data = { "username" : "Cougarr"};
-        return $http.post("http://192.168.1.2:1967/join", data, {withCredentials: false}).success(function(data, status){
+        return $http.post("http://192.168.1.5:1967/join", data, {withCredentials: false}).success(function(data, status){
 
             if(data.username){
                 console.log("moving to " + data.redirect);
@@ -65,7 +65,7 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
 
     service.getRooms = function(){
         console.log("getting rooms");
-        $http.get("http://192.168.1.3:1967/rooms", {withCredentials : false}).success(function(data, status){
+        $http.get("http://192.168.1.5:1967/rooms", {withCredentials : false}).success(function(data, status){
             service.rooms =  data.rooms;
         }).error(function(err){
             console.log(err);
@@ -149,14 +149,16 @@ app.factory("quizService", function($http, $rootScope, $q, $location, $cookies, 
 
     socketService.on("quiz:result", function(result)
     {
-        console.log("result is here!")
-        console.log(result)
-        service.result = result
         service.answerpending = (result == "pending") ? true : false
-        if(service.answerpending == true){
+        if(service.answerpending == true)
+        {
             console.log("waiting for other responses")
         }
-        else{$rootScope.$broadcast("quizresult");}
+        else
+        {
+            $rootScope.$broadcast("quizresult")
+            service.currentScores = result;
+        }
 
     })
     socketService.on("userdata", function(data){
